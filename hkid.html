@@ -1,0 +1,173 @@
+<html>
+<head>
+<title>Check digit</title>
+<base target=_blank>
+<style>
+  body, input {font-family:"Arial";}
+  input {color:blue; font-size:16pt; text-align:left;}
+</style>
+
+<script>
+var alpha="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+function chg(f){
+	var s='<embed src="'+f+'" width=1024 height=768>';
+	var myWindow = window.open("", "_blank");
+	myWindow.document.write(s);
+}
+
+function valid(idno){	// A123456
+	var a = idno.charAt(0).toUpperCase();
+	if(idno.length!=7 || a<"A" || a>"Z") return 0;
+	for(i=1;i<idno.length;i++)
+		if(idno.charAt(i)<"0" || idno.charAt(i)>"9") return 0;
+	return 1;
+}
+
+function checkID(){
+   var i,a,d, sum=0, s="", idno;
+   idno = document.all.idno.value;
+   document.all.rmdr.value = "";
+   document.all.wtSum.value = "";
+   document.all.chkDgt.value = "";
+   if(idno.length!=7) return;
+
+   if(valid(idno)==1){
+	a = idno.charAt(0).toUpperCase();
+	sum = 58*9 + (alpha.indexOf(a)+10)*8;
+	s = "58*9 +"+(alpha.indexOf(a)+10)+"*8"
+	for(i=1; i<=6; i++){
+	   sum += idno.charAt(i) * (8-i);
+	   s += " + " +idno.charAt(i) +"*" +(8-i);
+	}
+	document.all.wtSum.value = s+" = "+sum;
+	document.all.rmdr.value
+		= Math.floor(sum/11) + "..." + (sum%11);
+
+	d = sum%11;
+	if (d==0) d = "0";
+	else if (d==1) d = "A";
+	else d = 11-d;
+	document.all.chkDgt.value = d;
+   }
+   hideshow();
+}
+
+function checkISBN(){
+   var i, d="9", sum=0, s="", isbn;
+   isbn = document.all.isbn.value;
+   document.all.rmdrX.value = "";
+   document.all.wtSumX.value = "";
+   document.all.chkDgtX.value = "";
+   if(isbn.length!=9) return;
+
+   if(isbn.match(/^[0-9]{9}$/)){
+	for(i=0; i<9; i++){
+	   sum += isbn.charAt(i) * (10-i);
+	   s += isbn.charAt(i) +"*" +(10-i);
+	   if(i<8) s += " + ";
+	}
+	document.all.wtSumX.value = s+" = "+sum;
+	document.all.rmdrX.value
+		= Math.floor(sum/11) + "..." + (sum%11);
+
+	d = sum%11;
+	if (d==0) d = "0";
+	else if (d==1) d = "X";
+	else d = 11-d;
+	document.all.chkDgtX.value = d;
+    }
+   hideshow();
+}
+
+function hideshow(){
+	var color="white";
+	if(document.all.chkbox.checked){
+		color = "red";
+	}
+	document.all.rmdr.style.color = color;
+	document.all.wtSum.style.color = color;
+	document.all.chkDgt.style.color = color;
+
+	document.all.rmdrX.style.color = color;
+	document.all.wtSumX.style.color = color;
+	document.all.chkDgtX.style.color = color;
+}
+
+function init(){
+	checkID();
+	checkISBN();
+}
+</script>
+</head>
+
+<body onload="init()">
+<h1>檢查數位 Check Digit</h1>
+
+<h2>1. 身份証號碼</h2>
+<table cellpaddin=10 cellspacing=5>
+<tr>
+<td>ID Card#:</td>
+<td><input type=text name=idno value=A101010 size=10 onkeyup="checkID()">
+</td>
+</tr>
+
+<tr>
+<td>Sum =</td>
+<td><input type=text name=wtSum size=60 readonly></td>
+</tr>
+
+<tr>
+<td>Sum/11 =</td>
+<td><input type=text name=rmdr size=10 readonly>　// 0,1,2,3,4,5,6,7,8,9,10</td>
+</tr>
+
+<tr>
+<td>Check digit =</td>
+<td><input type=text name=chkDgt size=10 readonly>　// 0,A,9,8,7,6,5,4,3,2,1</td>
+</tr>
+
+<tr>
+<td valign=top>參考:</td>
+<td>
+<font size=+2>58*9=522<br>
+<script>
+for(var i=0;i<alpha.length;i++){
+	document.write(alpha.charAt(i));
+	if(i%5==4) document.write("&nbsp;&nbsp;");
+}
+</script>
+</font>
+<input type=checkbox name=chkbox onclick="hideshow()" checked>
+<font color=red size=+2> Answer </font>
+</td>
+</tr>
+</table>
+
+<hr>
+<h2>2. 國際標準書號 ISBN-10</h2>
+<table cellpaddin=10 cellspacing=5>
+<tr>
+<td>ISBN:</td>
+<td><input type=text name=isbn value=962001006 size=10 onkeyup="checkISBN()">
+</td>
+</tr>
+
+<tr>
+<td>Sum =</td>
+<td><input type=text name=wtSumX size=60 readonly></td>
+</tr>
+
+<tr>
+<td>Sum/11 =</td>
+<td><input type=text name=rmdrX size=10 readonly></td>
+</tr>
+
+<tr>
+<td>Check digit =</td>
+<td><input type=text name=chkDgtX size=10 readonly> 0-9,X=10</td>
+</tr>
+</table>
+
+</body>
+</html>
